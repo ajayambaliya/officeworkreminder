@@ -52,3 +52,32 @@ ${timeMsg}
 <i>Please take necessary action. Refer to ID: ${task.id.split('-')[0]}</i>
   `.trim();
 }
+
+export function formatConsolidatedReminder(tasks: any[]) {
+    const pending = tasks.filter(t => t.status === 'PENDING');
+    const inProgress = tasks.filter(t => t.status === 'IN_PROGRESS');
+
+    if (pending.length === 0 && inProgress.length === 0) return '';
+
+    let message = `🏛 <b>GOVERNMENT WORK SUMMARY</b> 🏛\n`;
+    message += `📅 <i>Date: ${new Date().toLocaleDateString('en-IN')}</i>\n\n`;
+
+    if (pending.length > 0) {
+        message += `⏳ <b>PENDING TASKS (${pending.length})</b>\n`;
+        pending.forEach((t, i) => {
+            message += `${i + 1}. ${t.title} (Due: ${new Date(t.due_date).toLocaleDateString()})\n`;
+        });
+        message += `\n`;
+    }
+
+    if (inProgress.length > 0) {
+        message += `🚧 <b>IN PROGRESS (${inProgress.length})</b>\n`;
+        inProgress.forEach((t, i) => {
+            message += `${i + 1}. ${t.title} (Due: ${new Date(t.due_date).toLocaleDateString()})\n`;
+        });
+        message += `\n`;
+    }
+
+    message += `🔗 <i>Log in for official action: ${process.env.SITE_URL || 'System Port'}</i>`;
+    return message.trim();
+}

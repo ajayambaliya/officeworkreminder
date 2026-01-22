@@ -135,6 +135,38 @@ export async function softDeleteTask(id: string) {
     return data;
 }
 
+export async function markTaskAsCompleted(id: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { data, error } = await supabase
+        .from('tasks')
+        .update({
+            status: 'COMPLETED',
+            completed_at: new Date().toISOString(),
+            completed_by: user?.id,
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error) throw error;
+
+    await logAudit({
+        action: 'MARK_COMPLETED',
+        tableName: 'tasks',
+        recordId: id,
+        newData: data,
+    });
+
+    revalidatePath('/tasks');
+    revalidatePath(`/tasks/${id}`);
+    revalidatePath('/dashboard');
+
+    return data as Task;
+}
+
 async function saveTaskVersion(taskId: string, version: number, data: any, userId?: string) {
     const supabase = await createClient();
     await supabase.from('task_versions').insert({

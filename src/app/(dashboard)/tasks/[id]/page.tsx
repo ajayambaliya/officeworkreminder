@@ -55,7 +55,7 @@ export default async function TaskDetailsPage(props: { params: Promise<{ id: str
                     Back to List
                 </Link>
                 <div className="flex gap-4">
-                    <TaskActions taskId={params.id} />
+                    <TaskActions taskId={params.id} currentStatus={task.status} />
                 </div>
             </div>
 
