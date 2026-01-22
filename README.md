@@ -69,13 +69,32 @@ If you get "Admin record not found", ensure the RLS policies in `supabase_schema
 - Add all environment variables.
 - Add `CRON_SECRET` and `SITE_URL` to **GitHub Repository Secrets**.
 
-## 📅 Cron Job
-The system uses GitHub Actions to trigger reminders at 09:00 AM IST daily. Ensure the `SITE_URL` and `CRON_SECRET` match between Vercel and GitHub.
+## 📅 Detailed Deployment & Cron Setup
 
-## 📜 Audit & Compliance
-To extract audit logs for RTI or internal review:
-1. Export the `audit_logs` table from Supabase as CSV.
-2. Filter by `record_id` to see the full lifecycle of any specific task.
+### 1. Vercel Deployment
+1. Connect your GitHub repo to **Vercel**.
+2. Add the following **Environment Variables** in Vercel Project Settings:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_CHANNEL_ID`
+   - `CRON_SECRET` (Generate a long random string)
+   - `SITE_URL` (Your Vercel deployment URL, e.g., `https://officeworkreminder.vercel.app`)
+
+### 2. GitHub Actions (Cron Job)
+The system is configured to trigger reminders via GitHub Actions.
+1. Go to your GitHub Repository **Settings > Secrets and variables > Actions**.
+2. Add these **Repository Secrets**:
+   - `SITE_URL`: Your full Vercel URL (e.g., `https://officeworkreminder.vercel.app`)
+   - `CRON_SECRET`: Must **EXACTLY MATCH** the `CRON_SECRET` you set in Vercel.
+3. The job is defined in `.github/workflows/daily-reminders.yml`.
+4. It is scheduled for **09:00 AM IST** (03:30 AM UTC) daily.
+5. **Manual Test**: Go to the **Actions** tab in GitHub, select "Daily Task Reminders", and click **Run workflow**.
+
+### 3. Verification
+- After deploying, visit `/api/health` to check if your DB and Telegram are connected.
+- Use the **"Ping Telegram"** button inside any task detail page to verify instant notifications.
 
 ---
 **Maintained for 5+ Years Reliability**
