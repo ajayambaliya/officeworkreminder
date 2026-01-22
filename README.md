@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Government-Grade Task Reminder & Audit System
 
-## Getting Started
+A production-ready, secure, and highly auditable task management system designed for Indian government office workflows. Built with Next.js, Supabase, and Telegram integration.
 
-First, run the development server:
+## 🚀 Key Features
+
+- **Government-Grade Security**: Admin-only access with strict RLS policies.
+- **Audit-Ready**: Every action (create, update, delete, login) is logged with old/new data snapshots.
+- **Task Versioning**: complete history of changes for every task.
+- **Automated Telegram Reminders**: Dynamic engine based on JSON rules (Daily, X days before, On Due Date).
+- **Bulk Operations**: Excel import/export for large-scale data migration.
+- **Mobile-First Design**: premium, modern interface with dark mode support.
+- **Soft Delete**: Data is preserved for audit compliance even when removed from view.
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 15 (App Router, TypeScript)
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth
+- **Styling**: Tailwind CSS
+- **Notifications**: Telegram Bot API
+- **Scheduler**: GitHub Actions
+- **Parsing**: XLSX.js
+
+## ⚙️ Environment Variables
+
+Required variables for deployment:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHANNEL_ID=your_channel_or_group_id
+
+CRON_SECRET=random_long_string
+SITE_URL=https://your-app.vercel.app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏗 Setup Instructions
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Supabase Initialization
+- Create a new Supabase project.
+- Run the provided `supabase_schema.sql` in the SQL Editor.
+- Enable Email/Password auth (disable signup if desired, but first user needs to be created).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Create First Admin
+Since public signup is disabled for security:
+1. Go to **Authentication > Users** in Supabase and click **"Add User"**.
+2. Copy the **User UID** of the newly created user.
+3. Go to **SQL Editor** and run the following (replacing the placeholder):
+   ```sql
+   -- REPLACE 'your-user-uuid-here' with the actual UID from step 2
+   INSERT INTO profiles (id, role) 
+   VALUES ('your-user-uuid-here', 'ADMIN');
+   ```
 
-## Learn More
+### 3. Apply RLS Fix (If experiencing Login errors)
+If you get "Admin record not found", ensure the RLS policies in `supabase_schema.sql` are applied correctly. The updated policy allows users to see their own profile to verify their role during sign-in.
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Telegram Bot Setup
+1. Create a bot using [@BotFather](https://t.me/BotFather).
+2. Create a private channel/group and add the bot as an Admin.
+3. Get the Channel ID (use [@username_to_id_bot](https://t.me/username_to_id_bot)).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Deployment
+- Deploy the project to **Vercel**.
+- Add all environment variables.
+- Add `CRON_SECRET` and `SITE_URL` to **GitHub Repository Secrets**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📅 Cron Job
+The system uses GitHub Actions to trigger reminders at 09:00 AM IST daily. Ensure the `SITE_URL` and `CRON_SECRET` match between Vercel and GitHub.
 
-## Deploy on Vercel
+## 📜 Audit & Compliance
+To extract audit logs for RTI or internal review:
+1. Export the `audit_logs` table from Supabase as CSV.
+2. Filter by `record_id` to see the full lifecycle of any specific task.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+**Maintained for 5+ Years Reliability**

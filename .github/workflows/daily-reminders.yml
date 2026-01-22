@@ -1,0 +1,17 @@
+name: Daily Task Reminders
+
+on:
+  schedule:
+    # Runs at 09:00 AM IST (03:30 AM UTC) every day
+    - cron: '30 3 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Reminder API
+        run: |
+          curl -X POST "${{ secrets.SITE_URL }}/api/cron/reminders" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -H "Content-Type: application/json"
