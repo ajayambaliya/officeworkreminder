@@ -92,9 +92,13 @@ The system is configured to trigger reminders via GitHub Actions.
 4. It is scheduled for **09:00 AM IST** (03:30 AM UTC) daily.
 5. **Manual Test**: Go to the **Actions** tab in GitHub, select "Daily Task Reminders", and click **Run workflow**.
 
-### 3. Verification
-- After deploying, visit `/api/health` to check if your DB and Telegram are connected.
-- Use the **"Ping Telegram"** button inside any task detail page to verify instant notifications.
+### 4. Manual Verification (Important)
+If you want to trigger the reminder manually from your terminal, you **must** use the `-L` flag to follow HTTPS redirects:
+```bash
+curl -L -X POST "https://your-site.vercel.app/api/cron/reminders" \
+  -H "Authorization: Bearer YOUR_CRON_SECRET"
+```
+*If you see "Redirecting...", it means you forgot the `-L` flag or used `http` instead of `https`.*
 
 ---
 **Maintained for 5+ Years Reliability**
