@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { format } from 'date-fns';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID;
@@ -44,7 +45,7 @@ ${urgentIcon} <b>OFFICIAL REMINDER</b> ${urgentIcon}
 <b>Task:</b> ${task.task_type}
 <b>Title:</b> ${task.title}
 <b>Department:</b> ${task.department || 'N/A'}
-<b>Due Date:</b> ${new Date(task.due_date).toLocaleDateString('en-IN')}
+<b>Due Date:</b> ${format(new Date(task.due_date), 'dd/MM/yyyy')}
 <b>Status:</b> ${task.status} ${statusIcon}
 
 ${timeMsg}
@@ -60,12 +61,12 @@ export function formatConsolidatedReminder(tasks: any[]) {
     if (pending.length === 0 && inProgress.length === 0) return '';
 
     let message = `🏛 <b>GOVERNMENT WORK SUMMARY</b> 🏛\n`;
-    message += `📅 <i>Date: ${new Date().toLocaleDateString('en-IN')}</i>\n\n`;
+    message += `📅 <i>Date: ${format(new Date(), 'dd/MM/yyyy')}</i>\n\n`;
 
     if (pending.length > 0) {
         message += `⏳ <b>PENDING TASKS (${pending.length})</b>\n`;
         pending.forEach((t, i) => {
-            message += `${i + 1}. ${t.title} (Due: ${new Date(t.due_date).toLocaleDateString()})\n`;
+            message += `${i + 1}. ${t.title} (Due: ${format(new Date(t.due_date), 'dd/MM/yyyy')})\n`;
         });
         message += `\n`;
     }
@@ -73,7 +74,7 @@ export function formatConsolidatedReminder(tasks: any[]) {
     if (inProgress.length > 0) {
         message += `🚧 <b>IN PROGRESS (${inProgress.length})</b>\n`;
         inProgress.forEach((t, i) => {
-            message += `${i + 1}. ${t.title} (Due: ${new Date(t.due_date).toLocaleDateString()})\n`;
+            message += `${i + 1}. ${t.title} (Due: ${format(new Date(t.due_date), 'dd/MM/yyyy')})\n`;
         });
         message += `\n`;
     }
